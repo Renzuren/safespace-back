@@ -204,8 +204,8 @@ class ReportModel {
       const reportRef = db.collection(this.collection);
       let query = reportRef.where('reportId', '==', reportId);
       
-      // Only add userId condition if userId exists and is not empty
-      if (userId && userId.trim() !== '') {
+      // Check if userId is a non-empty string
+      if (userId && typeof userId === 'string' && userId.trim()) {
         query = query.where('userId', '==', userId);
       }
       
@@ -218,9 +218,8 @@ class ReportModel {
       const doc = snapshot.docs[0];
       await doc.ref.update(updateData);
       
-      // Invalidate cache for this user after updating report
-      // Only invalidate if userId exists, otherwise skip
-      if (userId && userId.trim() !== '') {
+      // Invalidate cache only if userId is valid
+      if (userId && typeof userId === 'string' && userId.trim()) {
         await reportCache.invalidateUserCache(userId);
       }
       

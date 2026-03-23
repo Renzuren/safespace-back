@@ -29,7 +29,7 @@ class ReportController {
       const search = req.query.search;
 
       // Build filter object
-      const filters = { userId: userId };
+      const filters = { };
 
       // Add status filter if provided
       if (status) {

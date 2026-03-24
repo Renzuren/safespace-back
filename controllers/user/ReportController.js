@@ -35,6 +35,8 @@ class ReportController {
         complainedClassification,
         complainedCollege,
         complainedDepartment,
+        complainedConstituent,
+        complainedInsideCampus,
         complainantStory,
         complainedIncidentHappened,
         complainedPhysicalAppearance,
@@ -62,6 +64,8 @@ class ReportController {
         complainedFullName: "Complained Full Name",
         complainedSex: "Complained Sex",
         complainedClassification: "Complained Classification",
+        complainedConstituent: "Complained Constituent",
+        complainedInsideCampus: "Complained Inside Campus",
         complainantStory: "Complainant Story",
         complainedIncidentHappened: "Incident Happened",
         complainedPhysicalAppearance: "Physical Appearance",
@@ -238,6 +242,24 @@ class ReportController {
         });
       }
 
+      // Validate complainedConstituent
+      const validConstituent = ['Yes', 'No'];
+      if (!validConstituent.includes(complainedConstituent)) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'Invalid Complained Constituent.'
+        });
+      }
+
+      // Validate complainedInsideCampus
+      const validInsideCampus = ['Yes', 'No'];
+      if (!validInsideCampus.includes(complainedInsideCampus)) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'Invalid Complained Inside Campus.'
+        });
+      }
+
       // Validate complainantStory (required)
       if (!complainantStory || complainantStory.trim().length === 0) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({
@@ -347,6 +369,8 @@ class ReportController {
         complainedClassification: complainedClassification,
         complainedCollege: complainedCollege.trim(),
         complainedDepartment: complainedDepartment.trim(),
+        complainedConstituent: complainedConstituent.trim(),
+        complainedInsideCampus: complainedInsideCampus.trim(),
         complainantStory: complainantStory.trim(),
         complainedIncidentHappened: complainedIncidentHappened.trim(),
         complainedPhysicalAppearance: complainedPhysicalAppearance.trim(),

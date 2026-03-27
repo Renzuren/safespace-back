@@ -229,6 +229,113 @@ class ReportModel {
     }
   }
 
+  // Severity & Offense
+  static async getCountWithSanction(fullName, severity, classification) {
+    try {
+      const reportsRef = db.collection(this.collection);
+      
+      // Get all reports
+      const snapshot = await reportsRef.get();
+      
+      const searchNameLower = fullName.toLowerCase().trim();
+      let count = 0;
+      
+      // Count reports where complainedFullName matches the search
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const complainedName = data.complainedFullName?.toLowerCase() || '';
+        
+        // Check if the complained name contains the search name (partial match)
+        if (complainedName.includes(searchNameLower)) {
+          count++;
+        }
+      });
+      
+      // Determine sanction based on severity, classification, and count
+      const sanction = this.getSanction(severity, classification, count);
+      
+      return {
+        count: count,
+        sanction: sanction
+      };
+      
+    } catch (error) {
+      console.error('Error getting report count with sanction:', error);
+      throw error;
+    }
+  }
+
+  static getSanction(severity, classification, offenseCount) {
+    // If severity is None, no sanction
+    if (severity === 'None') {
+      return 'No sanction applicable';
+    }
+    
+    // Check if classification is Student
+    const isStudent = classification === 'Student';
+    
+    // For Students
+    if (isStudent) {
+      switch(severity) {
+        case 'Light':
+          if (offenseCount === 1) {
+            return 'Reprimand or community service not exceeding 30 hours';
+          } else if (offenseCount === 2) {
+            return 'Suspension for not exceeding one (1) semester';
+          } else if (offenseCount >= 3) {
+            return 'Expulsion';
+          }
+          break;
+          
+        case 'Less Grave':
+          if (offenseCount === 1) {
+            return 'Community service for 60 hours';
+          } else if (offenseCount === 2) {
+            return 'Suspension for one (1) year';
+          } else if (offenseCount >= 3) {
+            return 'Expulsion';
+          }
+          break;
+          
+        case 'Grave':
+          if (offenseCount >= 1) {
+            return 'Suspension for one (1) academic year to expulsion';
+          }
+          break;
+      }
+    } 
+    // For Non-Students (Professor, Instructor, Teacher, Gov't Employee, Stranger, Co-worker, Colleague)
+    else {
+      switch(severity) {
+        case 'Light':
+          if (offenseCount === 1) {
+            return 'Reprimand or suspension for one (1) month and one (1) day to six (6) months';
+          } else if (offenseCount === 2) {
+            return 'Fine or suspension for six (6) months and one (1) day to one (1) year';
+          } else if (offenseCount >= 3) {
+            return 'Dismissal';
+          }
+          break;
+          
+        case 'Less Grave':
+          if (offenseCount === 1) {
+            return 'Suspension for six (6) months and one (1) day to one (1) year';
+          } else if (offenseCount >= 2) {
+            return 'Dismissal';
+          }
+          break;
+          
+        case 'Grave':
+          if (offenseCount >= 1) {
+            return 'Dismissal';
+          }
+          break;
+      }
+    }
+    
+    return 'No applicable sanction based on current offense count';
+  }
+
   // Dashboard
   static async getTotalReports() {
     try {

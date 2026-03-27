@@ -17,4 +17,11 @@ router.get(
   ReportController.get
 );
 
+router.get(
+  '/sanctions',
+  AuthenticateToken,
+  verifyRole(['user']),
+  ReportController.getCount
+);
+
 module.exports = router;

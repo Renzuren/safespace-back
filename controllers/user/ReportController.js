@@ -516,6 +516,90 @@ class ReportController {
       });
     }
   }
+  
+  async getCount(req, res) {
+    try {
+      // Get user ID from authenticated token
+      const userId = req.user?.userId || req.user?.id;
+      
+      // Check if user is authenticated
+      if (!userId) {
+        return res.status(STATUS_CODES.UNAUTHORIZED).json({
+          success: false,
+          message: 'User not authenticated'
+        });
+      }
+
+      // Get parameters from query
+      const { fullName, severity, classification } = req.query;
+
+      // Validate required parameters
+      if (!fullName) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'Please provide fullName parameter'
+        });
+      }
+
+      if (!severity) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'Please provide severity parameter'
+        });
+      }
+
+      if (!classification) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'Please provide classification parameter'
+        });
+      }
+
+      // Validate severity values
+      const validSeverities = ['Grave', 'Less Grave', 'Light', 'None'];
+      if (!validSeverities.includes(severity)) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'Invalid severity. Must be Grave, Less Grave, Light, or None'
+        });
+      }
+
+      // Validate classification values
+      const validClassifications = ['Student', 'Professor', 'Instructor', 'Teacher', `Gov't Employee`, 'Stranger', 'Co-worker', 'Colleague'];
+      if (!validClassifications.includes(classification)) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'Invalid classification'
+        });
+      }
+
+      // Call the model to get the count and determine sanction
+      const result = await ReportModel.getCountWithSanction(
+        fullName.trim(),
+        severity,
+        classification
+      );
+
+      return res.status(STATUS_CODES.OK).json({
+        success: true,
+        data: {
+          fullName: fullName.trim(),
+          severity: severity,
+          classification: classification,
+          reportCount: result.count,
+          sanction: result.sanction,
+          recommendation: result.recommendation
+        }
+      });
+
+    } catch (error) {
+      console.error('Error fetching report count:', error);
+      return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: 'Failed to fetch report count'
+      });
+    }
+  }
 }
 
 module.exports = new ReportController();

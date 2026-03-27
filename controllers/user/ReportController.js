@@ -181,11 +181,11 @@ class ReportController {
       }
 
       // Validate classification
-      const validClassifications = ['Student', 'Faculty', 'REPS', 'Admin', 'ICS', 'Non UP'];
+      const validClassifications = ['Student', 'Professor', 'Instructor', 'Teacher', `Gov't Employee`, 'Stranger'];
       if (!validClassifications.includes(classification)) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({
           success: false,
-          message: 'Invalid Classification. Must be Student, Faculty, REPS, Admin, ICS, or Non UP'
+          message: 'Invalid Classification.'
         });
       }
 
@@ -223,10 +223,11 @@ class ReportController {
       }
 
       // Validate complainedClassification
-      if (!validClassifications.includes(complainedClassification)) {
+      const validComplainedClassifications = ['Student', 'Professor', 'Instructor', 'Teacher', `Gov't Employee`, 'Stranger', 'Co-Worker', 'Colleague'];
+      if (!validComplainedClassifications.includes(complainedClassification)) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({
           success: false,
-          message: 'Invalid Complained Classification. Must be Student, Faculty, REPS, Admin, ICS, or Non UP'
+          message: 'Invalid Classification.'
         });
       }
 

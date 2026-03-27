@@ -139,8 +139,8 @@ class ReportController {
             message: 'Invalid offense level. Valid values: Physical Harassment, Verbal Harassment, Non-Verbal Harassment, Cyber Sexual Harassment, Not Harassment'
           });
         }
-        // Store offense level in the 'remarks' field (matches the database schema)
-        updateData.remarks = offenseLevel;
+        // Store offense level in the 'predictedOffense' field (matches the database schema)
+        updateData.predictedOffense = offenseLevel;
         hasUpdates = true;
       }
 

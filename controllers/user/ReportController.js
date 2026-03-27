@@ -45,7 +45,11 @@ class ReportController {
         remarks,
         whereDidYouHearAboutUs,
         otherWhereDidYouHearAboutUs,
-        applicableLaws
+        applicableLaws,
+        predictedOffense,
+        predictedOffenseConfidence,
+        predictedSeverity,
+        predictedSeverityConfidence
       } = req.body;
 
       // Define required fields with display names
@@ -74,7 +78,11 @@ class ReportController {
         complainedPhysicalAppearance: "Physical Appearance",
         procedureType: "Procedure Type",
         whereDidYouHearAboutUs: "Where Did You Hear About Us",
-        applicableLaws: "Applicable Law"
+        applicableLaws: "Applicable Law",
+        predictedOffense: "Offense",
+        predictedOffenseConfidence: "Offense Confidence",
+        predictedSeverity: "Severity",
+        predictedSeverityConfidence: "Severity Confidence"
       };
 
       // Check for missing required fields one at a time
@@ -396,6 +404,10 @@ class ReportController {
         applicableLaws: Array.isArray(applicableLaws) 
           ? applicableLaws.join(', ') 
           : (applicableLaws ? applicableLaws.trim() : ''),
+        predictedOffense: predictedOffense || null,
+        predictedOffenseConfidence: predictedOffenseConfidence !== undefined ? predictedOffenseConfidence : null,
+        predictedSeverity: predictedSeverity || null,
+        predictedSeverityConfidence: predictedSeverityConfidence !== undefined ? predictedSeverityConfidence : null,
         status: 'pending',
         createdAt: new Date(),
         updatedAt: new Date()

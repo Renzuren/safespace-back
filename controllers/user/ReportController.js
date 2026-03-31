@@ -15,6 +15,7 @@ class ReportController {
         });
       }
 
+      // Destructure request body – ADD incidentDate and incidentTime
       const {
         firstName,
         middleName,
@@ -49,10 +50,12 @@ class ReportController {
         predictedOffense,
         predictedOffenseConfidence,
         predictedSeverity,
-        predictedSeverityConfidence
+        predictedSeverityConfidence,
+        incidentDate,      // NEW
+        incidentTime       // NEW
       } = req.body;
 
-      // Define required fields with display names
+      // Define required fields with display names – ADD incidentDate and incidentTime
       const requiredFields = {
         firstName: "First Name",
         middleName: "Middle Name",
@@ -82,7 +85,9 @@ class ReportController {
         predictedOffense: "Offense",
         predictedOffenseConfidence: "Offense Confidence",
         predictedSeverity: "Severity",
-        predictedSeverityConfidence: "Severity Confidence"
+        predictedSeverityConfidence: "Severity Confidence",
+        incidentDate: "Incident Date",      // NEW
+        incidentTime: "Incident Time"       // NEW
       };
 
       // Check for missing required fields one at a time
@@ -255,13 +260,13 @@ class ReportController {
         });
       }
 
-      // Validate constituent
+      // Validate victimConstituent
       const validVictimConstituent = ['Yes', 'No'];
       if (!validVictimConstituent.includes(victimConstituent)) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({
           success: false,
           message: 'Invalid Constituent'
-        })
+        });
       }
 
       // Validate complainedConstituent
@@ -282,7 +287,7 @@ class ReportController {
         });
       }
 
-      // Validate complainantStory (required)
+      // Validate complainantStory
       if (!complainantStory || complainantStory.trim().length === 0) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({
           success: false,
@@ -296,7 +301,7 @@ class ReportController {
         });
       }
 
-      // Validate complainedIncidentHappened (required)
+      // Validate complainedIncidentHappened
       if (!complainedIncidentHappened || complainedIncidentHappened.trim().length === 0) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({
           success: false,
@@ -310,7 +315,7 @@ class ReportController {
         });
       }
 
-      // Validate complainedPhysicalAppearance (required)
+      // Validate complainedPhysicalAppearance
       if (!complainedPhysicalAppearance || complainedPhysicalAppearance.trim().length === 0) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({
           success: false,
@@ -325,11 +330,11 @@ class ReportController {
       }
 
       // Validate procedureType
-      const validProcedureTypes = ['Formal procedure', 'Information procedure', 'Undecided / need guidance'];
+      const validProcedureTypes = ['Formal procedure', 'Informal procedure', 'Undecided / need guidance'];
       if (!validProcedureTypes.includes(procedureType)) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({
           success: false,
-          message: 'Invalid Procedure Type. Must be Formal procedure, Information procedure, or Undecided / need guidance'
+          message: 'Invalid Procedure Type. Must be Formal procedure, Informal procedure, or Undecided / need guidance'
         });
       }
 
@@ -362,6 +367,31 @@ class ReportController {
         return res.status(STATUS_CODES.BAD_REQUEST).json({
           success: false,
           message: 'Other source must not exceed 100 characters'
+        });
+      }
+
+      // NEW: Validate incidentDate (format YYYY-MM-DD)
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(incidentDate)) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'Incident Date must be in YYYY-MM-DD format'
+        });
+      }
+      const parsedDate = new Date(incidentDate);
+      if (isNaN(parsedDate.getTime())) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'Incident Date is not a valid date'
+        });
+      }
+
+      // NEW: Validate incidentTime (format HH:MM)
+      const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+      if (!timeRegex.test(incidentTime)) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'Incident Time must be in HH:MM format'
         });
       }
 
@@ -399,7 +429,7 @@ class ReportController {
       // Create report ID using uuid
       const reportId = uuidv4();
 
-      // Prepare report data for insertion
+      // Prepare report data for insertion – ADD incidentDate and incidentTime
       const reportData = {
         reportId: reportId,
         userId: userId,
@@ -447,7 +477,11 @@ class ReportController {
         previousReportCount: sanctionResult?.reportCount || 0,
         recommendedSanction: sanctionResult?.recommendedSanction || null,
         isRepeatOffender: sanctionResult?.isRepeatOffender || false,
-        offenseLevel: sanctionResult?.offenseLevel || 'First offense'
+        offenseLevel: sanctionResult?.offenseLevel || 'First offense',
+
+        // NEW: Incident date and time
+        incidentDate: incidentDate,
+        incidentTime: incidentTime
       };
 
       // Insert report into database

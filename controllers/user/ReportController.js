@@ -55,6 +55,9 @@ class ReportController {
         incidentTime       // NEW
       } = req.body;
 
+      console.log('🔵 [1] incidentDate from body:', incidentDate);
+      console.log('🔵 [1] incidentTime from body:', incidentTime);
+
       // Define required fields with display names – ADD incidentDate and incidentTime
       const requiredFields = {
         firstName: "First Name",
@@ -395,6 +398,9 @@ class ReportController {
         });
       }
 
+      console.log('🔵 [2] After validation - incidentDate:', incidentDate);
+      console.log('🔵 [2] After validation - incidentTime:', incidentTime);
+
       // Check existing reports and get sanction recommendation
       let sanctionResult = null;
       try {
@@ -483,6 +489,9 @@ class ReportController {
         incidentDate: incidentDate,
         incidentTime: incidentTime
       };
+      
+      console.log('🔵 [3] Before model - incidentDate:', reportData.incidentDate);
+      console.log('🔵 [3] Before model - incidentTime:', reportData.incidentTime);
 
       // Insert report into database
       const insertData = await ReportModel.create(reportData);

@@ -9,8 +9,23 @@ class ReportModel {
 
   static async create(reportData) {
     try {
+      console.log('🔵 [4] Model received - incidentDate:', reportData.incidentDate);
+      console.log('🔵 [4] Model received - incidentTime:', reportData.incidentTime);
+      console.log('🔵 [4] Full reportData keys:', Object.keys(reportData).join(', '));
+
+      // Log entire data structure before Firestore
+      console.log('🔥 About to write to Firestore:', JSON.stringify(reportData, null, 2));
+
       const usersRef = db.collection(this.collection);
       const docRef = await usersRef.add(reportData);
+      
+      // Immediately read back to verify what was stored
+      const doc = await docRef.get();
+      const storedData = doc.data();
+      console.log('📄 Stored document:', JSON.stringify(storedData, null, 2));
+      console.log('✅ Firestore write successful, doc id:', docRef.id);
+      console.log('📄 Stored incidentDate:', storedData.incidentDate);
+      console.log('📄 Stored incidentTime:', storedData.incidentTime);
       
       // Invalidate cache for this user after creating new report
       await reportCache.invalidateUserCache(reportData.userId);
@@ -20,7 +35,7 @@ class ReportModel {
         ...reportData
       };
     } catch (error) {
-      console.error('Error creating report:', error);
+      console.error('❌ Firestore write error:', error);
       throw error;
     }
   }

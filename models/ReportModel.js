@@ -2,6 +2,8 @@ const { db } = require('../utils/database');
 const { COLLECTIONS } = require('../utils/constants');
 const reportCache = require('../cache/reportCache');
 
+console.log('🔥🔥🔥 UPDATED CONTROLLER LOADED 🔥🔥🔥');
+
 class ReportModel {
   static get collection() {
     return COLLECTIONS.COLLECTIONS_REPORTS;
